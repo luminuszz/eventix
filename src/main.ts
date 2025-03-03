@@ -1,6 +1,6 @@
+import { EnvService } from '@infra/env/env.service'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import { EnvService } from './infra/env/env.service'
 
 import {
   FastifyAdapter,
@@ -8,11 +8,12 @@ import {
 } from '@nestjs/platform-fastify'
 
 async function bootstrap() {
+  const adapter = new FastifyAdapter()
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    adapter,
   )
-
   const apiPort = app.get(EnvService).get('API_PORT')
 
   await app.listen(apiPort, '0.0.0.0')

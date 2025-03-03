@@ -1,15 +1,16 @@
-import { Global, Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { z } from "zod";
-import { EnvService } from "./env.service";
+import { Global, Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { z } from 'zod'
+import { EnvService } from './env.service'
 
 const envSchema = z.object({
   DB_URL: z.string(),
   API_PORT: z.coerce.number(),
-  ENVIRONMENT: z.enum(["development", "production"]),
-});
+  ENVIRONMENT: z.enum(['development', 'production']),
+  JWT_SECRET: z.string(),
+})
 
-export type EnvConfig = z.infer<typeof envSchema>;
+export type EnvConfig = z.infer<typeof envSchema>
 
 @Global()
 @Module({
