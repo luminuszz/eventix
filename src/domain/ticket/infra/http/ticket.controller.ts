@@ -9,10 +9,7 @@ export class TicketController {
   constructor(private commandBus: CommandBus) {}
 
   @Post('')
-  async postTicket(
-    @Body() { eventId }: CreateTicketDto,
-    @User('id') userId: string,
-  ) {
-    await this.commandBus.execute(new CreateTicketCommand(userId, eventId))
+  async postTicket(@Body() dto: CreateTicketDto, @User('id') userId: string) {
+    await this.commandBus.execute(new CreateTicketCommand(userId, dto.eventId))
   }
 }

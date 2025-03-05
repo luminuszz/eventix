@@ -20,6 +20,7 @@ export class EventController {
         data.description,
         userId,
         data.maxCapacity,
+        data.type,
       ),
     )
   }

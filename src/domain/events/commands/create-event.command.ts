@@ -1,3 +1,4 @@
+import { EventTypeEnum } from '@domain/events/entities/event-type.enum'
 import { UserEntity } from '@domain/users/domain/users.entity'
 import { BadRequestException } from '@nestjs/common'
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
@@ -11,6 +12,7 @@ export class CreateEventCommand {
     public readonly description: string,
     public readonly userId: string,
     public readonly maxCapacity: number,
+    public readonly type: EventTypeEnum,
   ) {}
 }
 
@@ -31,6 +33,7 @@ export class CreateEventCommandHandler
     name,
     userId,
     maxCapacity,
+    type,
   }: CreateEventCommand) {
     const user = await this.userRepository.findOne({ where: { id: userId } })
 
@@ -42,6 +45,7 @@ export class CreateEventCommandHandler
         name,
         maxCapacity,
         ownerId: user.id,
+        type,
       }),
     )
 

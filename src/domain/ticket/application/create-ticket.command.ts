@@ -1,6 +1,8 @@
+import { EventTypeEnum } from '@domain/events/entities/event-type.enum'
 import { EventEntity } from '@domain/events/entities/event.entity'
+import { TicketCreatedEvent } from '@domain/ticket/domain/ticket-created.event'
 import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
-import { UserEntity } from '@domain/users/domain/users.entity'
+import { TicketStatusEnum } from '@domain/ticket/domain/ticket.status.enum'
 import { BadRequestException } from '@nestjs/common'
 import {
   Command,
@@ -11,7 +13,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-export class CreateTicketCommand extends Command<{ ticketId: string }> {
+export class CreateTicketCommand extends Command<void> {
   constructor(
     public readonly userId: string,
     public readonly eventId: string,
@@ -27,18 +29,14 @@ export class CreateTicketCommandHandler
   constructor(
     @InjectRepository(TicketEntity)
     private readonly ticketRepository: Repository<TicketEntity>,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+
     @InjectRepository(EventEntity)
     private readonly eventRepository: Repository<EventEntity>,
 
     private readonly eventPublisher: EventPublisher,
   ) {}
 
-  async execute({
-    eventId,
-    userId,
-  }: CreateTicketCommand): Promise<{ ticketId: string }> {
+  async execute({ eventId, userId }: CreateTicketCommand) {
     const existsEvent = await this.eventRepository.findOne({
       where: { id: eventId },
     })
@@ -59,27 +57,22 @@ export class CreateTicketCommandHandler
       throw new BadRequestException('Event is full')
     }
 
-    const user = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    })
-
-    if (!user) {
-      throw new BadRequestException('User not found')
-    }
-
     const ticket = this.eventPublisher.mergeObjectContext(
       this.ticketRepository.create({
+        userId,
         eventId: existsEvent.id,
-        userId: user.id,
+        status: TicketStatusEnum.PENDING,
       }),
     )
 
+    if (existsEvent.type === EventTypeEnum.FREE) {
+      ticket.aprove()
+    } else {
+      ticket.apply(new TicketCreatedEvent(ticket))
+    }
+
     await this.ticketRepository.save(ticket)
 
-    return {
-      ticketId: ticket.id,
-    }
+    ticket.commit()
   }
 }
