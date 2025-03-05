@@ -1,4 +1,4 @@
-import { UserEntity } from '@domain/users/users.entity'
+import { UserEntity } from '@domain/users/domain/users.entity'
 import { JwtPayload } from '@infra/utils/jwt'
 import {
   CanActivate,
@@ -11,6 +11,7 @@ import {
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
+import { FastifyRequest } from 'fastify'
 import { Repository } from 'typeorm'
 
 const IS_PUBLIC_METADATA_KEY = 'isPublic'
@@ -18,6 +19,10 @@ const IS_PUBLIC_METADATA_KEY = 'isPublic'
 export const WithAuth = () => UseGuards(AuthGuard)
 
 export const IsPublic = () => SetMetadata(IS_PUBLIC_METADATA_KEY, true)
+
+export interface FastifyRequestWithUser extends FastifyRequest {
+  user: JwtPayload
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -31,38 +36,44 @@ export class AuthGuard implements CanActivate {
   private context: ExecutionContext
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    this.context = context
+    try {
+      this.context = context
 
-    const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
-      IS_PUBLIC_METADATA_KEY,
-      [context.getClass(), context.getHandler()],
-    )
+      const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
+        IS_PUBLIC_METADATA_KEY,
+        [context.getClass(), context.getHandler()],
+      )
 
-    if (isPublicRoute) return true
+      if (isPublicRoute) return true
 
-    const jwtToken = this.extractTokenFormRequest()
+      const jwtToken = this.extractTokenFormRequest()
 
-    if (!jwtToken) {
+      await this.validateUserToken(jwtToken)
+
+      return true
+    } catch {
       throw new UnauthorizedException()
     }
-
-    await this.validateUserToken(jwtToken)
-
-    return true
   }
 
-  private extractTokenFormRequest(): string | undefined {
-    const request = this.context.switchToHttp().getRequest()
+  private extractTokenFormRequest(): string {
+    const request = this.context
+      .switchToHttp()
+      .getRequest<FastifyRequestWithUser>()
 
     if (!request.headers['authorization']) {
       throw new UnauthorizedException()
     }
 
+    console.log(request.headers?.authorization)
+
     return request.headers?.authorization?.split(' ')[1]
   }
 
   private injectDecodedPayloadOnRequest(decodedPayload: JwtPayload) {
-    this.context.switchToHttp().getRequest()['user'] = {
+    this.context.switchToHttp().getRequest<FastifyRequestWithUser>()
+
+    this.context.switchToHttp().getRequest<FastifyRequestWithUser>().user = {
       email: decodedPayload.email,
       name: decodedPayload.name,
       id: decodedPayload.id,

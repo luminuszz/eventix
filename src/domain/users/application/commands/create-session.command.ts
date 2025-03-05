@@ -1,5 +1,5 @@
 import { HashProvider } from '@domain/users/contracts/hash.provider'
-import { UserEntity } from '@domain/users/users.entity'
+import { UserEntity } from '@domain/users/domain/users.entity'
 import { JwtPayload } from '@infra/utils/jwt'
 import { BadRequestException } from '@nestjs/common'
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs'

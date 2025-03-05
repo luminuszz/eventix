@@ -1,3 +1,4 @@
+import { User } from '@domain/users/infra/http/user-auth.decorator'
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { CreateEventCommand } from '../commands/create-event.command'
@@ -12,11 +13,14 @@ export class EventController {
   ) {}
 
   @Post()
-  async createEvent(@Body() data: CreateEventDto) {
-    const userId = ''
-
+  async createEvent(@Body() data: CreateEventDto, @User('id') userId: string) {
     await this.commandBus.execute(
-      new CreateEventCommand(data.name, data.description, userId),
+      new CreateEventCommand(
+        data.name,
+        data.description,
+        userId,
+        data.maxCapacity,
+      ),
     )
   }
 

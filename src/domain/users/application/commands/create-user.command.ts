@@ -1,9 +1,9 @@
+import { HashProvider } from '@domain/users/contracts/hash.provider'
 import { BadRequestException } from '@nestjs/common'
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { HashProvider } from '../contracts/hash.provider'
-import { UserEntity } from '../users.entity'
+import { UserEntity } from '../../domain/users.entity'
 
 export class CreateUserCommand {
   constructor(

@@ -1,4 +1,4 @@
-import { UserEntity } from '@domain/users/users.entity'
+import { UserEntity } from '@domain/users/domain/users.entity'
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { CreateEventCommandHandler } from './commands/create-event.command'
