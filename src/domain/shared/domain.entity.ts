@@ -1,18 +1,24 @@
-import { AggregateRoot } from "@nestjs/cqrs";
-import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { AggregateRoot } from '@nestjs/cqrs'
+import {
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
-export class DomainEntity extends AggregateRoot {
+export class DomainEvent {}
+
+export class DomainEntity extends AggregateRoot<DomainEvent> {
   constructor() {
-    super();
-    this.autoCommit = false;
+    super()
+    this.autoCommit = false
   }
 
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 }

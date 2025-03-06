@@ -4,11 +4,11 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
 
 @EventsHandler(TicketCreatedEvent)
 export class OnTicketCreatedEventHandler
-  implements IEventHandler<OnTicketCreatedEventHandler>
+  implements IEventHandler<TicketCreatedEvent>
 {
   private logger = new Logger(OnTicketCreatedEventHandler.name)
 
-  handle(event: OnTicketCreatedEventHandler) {
+  handle(event: TicketCreatedEvent) {
     this.logger.log(
       `[OnTicketCreatedEventHandler] ${event} -> sending email with new ticket`,
     )

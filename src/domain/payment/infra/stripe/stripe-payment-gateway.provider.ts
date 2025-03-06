@@ -13,8 +13,9 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
     this.priceId = env.get('STRIPE_PRICE_ID')
   }
 
-  async generatePaymentUrl(paymentId: string): Promise<string> {
+  async generatePaymentUrl(paymentId: string, email: string): Promise<string> {
     const session = await this.stripe.checkout.sessions.create({
+      customer_email: email,
       mode: 'payment',
       currency: 'BRL',
       payment_method_types: ['card', 'boleto'],
@@ -37,5 +38,16 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
     }
 
     return session.url
+  }
+
+  public buildWebhookEvent(
+    body: string | Buffer,
+    signature: string,
+  ): Stripe.Event {
+    return this.stripe.webhooks.constructEvent(
+      body,
+      signature,
+      this.env.get('STRIPE_WEBHOOK_SECRET'),
+    )
   }
 }

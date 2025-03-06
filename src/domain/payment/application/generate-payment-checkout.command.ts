@@ -1,6 +1,7 @@
 import { PaymentGateway } from '@domain/payment/application/contracts/payment-gateway'
 import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
 import { PaymentEntity } from '@domain/payment/domain/payment.entity'
+import { UserEntity } from '@domain/users/domain/users.entity'
 import { BadRequestException } from '@nestjs/common'
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -25,6 +26,8 @@ export class GeneratePaymentCheckoutCommandHandler
     @InjectRepository(PaymentEntity)
     private readonly payments: Repository<PaymentEntity>,
     private readonly paymentGateway: PaymentGateway,
+    @InjectRepository(UserEntity)
+    private readonly users: Repository<UserEntity>,
   ) {}
 
   async execute({ ticketId, userId }: GeneratePaymentCheckoutCommand): Promise<{
@@ -40,15 +43,24 @@ export class GeneratePaymentCheckoutCommandHandler
       throw new BadRequestException('Payment already exists for this ticket')
     }
 
+    const user = await this.users.findOne({ where: { id: userId } })
+
+    if (!user) {
+      throw new BadRequestException('User not found')
+    }
+
     const payment = this.payments.create({
       ticketId,
-      userId,
+      userId: user.id,
       status: PaymentStatus.PENDING,
     })
 
     await this.payments.save(payment)
 
-    const paymentUrl = await this.paymentGateway.generatePaymentUrl(payment.id)
+    const paymentUrl = await this.paymentGateway.generatePaymentUrl(
+      payment.id,
+      user.email,
+    )
 
     payment.commit()
 

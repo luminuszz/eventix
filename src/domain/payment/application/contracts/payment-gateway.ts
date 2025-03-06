@@ -1,3 +1,3 @@
 export abstract class PaymentGateway {
-  abstract generatePaymentUrl(paymentId: string): Promise<string>
+  abstract generatePaymentUrl(paymentId: string, email: string): Promise<string>
 }

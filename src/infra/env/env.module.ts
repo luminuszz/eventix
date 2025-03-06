@@ -10,6 +10,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   STRIPE_PRIVATE_API_KEY: z.string(),
   STRIPE_PRICE_ID: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
 })
 
 export type EnvConfig = z.infer<typeof envSchema>

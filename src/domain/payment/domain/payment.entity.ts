@@ -1,3 +1,4 @@
+import { PaymentConfirmedEvent } from '@domain/payment/domain/payment-confirmed.event'
 import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
 import { DomainEntity } from '@domain/shared/domain.entity'
 import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
@@ -16,4 +17,9 @@ export class PaymentEntity extends DomainEntity {
 
   @ManyToOne(() => TicketEntity)
   ticket: TicketEntity
+
+  markAsPaid() {
+    this.status = PaymentStatus.PAID
+    this.apply(new PaymentConfirmedEvent(this))
+  }
 }

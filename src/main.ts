@@ -13,6 +13,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     adapter,
+    {
+      rawBody: true,
+    },
   )
   const apiPort = app.get(EnvService).get('API_PORT')
 
