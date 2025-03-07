@@ -2,4 +2,5 @@ export enum TicketStatusEnum {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
   CANCELED = 'CANCELED',
+  CHECKED_IN = 'CHECKED_IN',
 }

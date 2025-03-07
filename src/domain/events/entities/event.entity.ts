@@ -2,8 +2,7 @@ import { UserEntity } from '@domain/users/domain/users.entity'
 
 import { EventTypeEnum } from '@domain/events/entities/event-type.enum'
 import { DomainEntity } from '@domain/shared/domain.entity'
-import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm'
+import { Column, Entity, ManyToOne } from 'typeorm'
 
 @Entity('events')
 export class EventEntity extends DomainEntity {
@@ -25,12 +24,9 @@ export class EventEntity extends DomainEntity {
   @Column({ enum: EventTypeEnum, type: 'enum', default: EventTypeEnum.FREE })
   type: EventTypeEnum
 
-  @ManyToOne(() => UserEntity)
-  owner: UserEntity
-
-  @OneToMany(
-    () => TicketEntity,
-    (ticket) => ticket.event,
+  @ManyToOne(
+    () => UserEntity,
+    (user) => user.id,
   )
-  participants: TicketEntity[]
+  owner: UserEntity
 }

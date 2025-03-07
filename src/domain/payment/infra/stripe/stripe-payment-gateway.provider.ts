@@ -20,6 +20,7 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
       currency: 'BRL',
       payment_method_types: ['card', 'boleto'],
       client_reference_id: paymentId,
+      customer_creation: 'if_required',
       line_items: [
         {
           price: this.priceId,
@@ -40,10 +41,7 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
     return session.url
   }
 
-  public buildWebhookEvent(
-    body: string | Buffer,
-    signature: string,
-  ): Stripe.Event {
+  public buildWebhookEvent(body: string | Buffer, signature: string): Stripe.Event {
     return this.stripe.webhooks.constructEvent(
       body,
       signature,

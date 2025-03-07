@@ -48,10 +48,7 @@ export class GeneratePaymentCheckoutCommandHandler
 
     await this.paymentRepository.save(payment)
 
-    const paymentUrl = await this.paymentGateway.generatePaymentUrl(
-      payment.id,
-      user.email,
-    )
+    const paymentUrl = await this.paymentGateway.generatePaymentUrl(payment.id, user.email)
 
     return {
       paymentUrl,

@@ -6,7 +6,6 @@ import {
   Injectable,
   SetMetadata,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
@@ -15,8 +14,6 @@ import { FastifyRequest } from 'fastify'
 import { Repository } from 'typeorm'
 
 const IS_PUBLIC_METADATA_KEY = 'isPublic'
-
-export const WithAuth = () => UseGuards(AuthGuard)
 
 export const IsPublic = () => SetMetadata(IS_PUBLIC_METADATA_KEY, true)
 
@@ -39,10 +36,10 @@ export class AuthGuard implements CanActivate {
     try {
       this.context = context
 
-      const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
-        IS_PUBLIC_METADATA_KEY,
-        [context.getClass(), context.getHandler()],
-      )
+      const isPublicRoute = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_METADATA_KEY, [
+        context.getClass(),
+        context.getHandler(),
+      ])
 
       if (isPublicRoute) return true
 
@@ -57,9 +54,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFormRequest(): string {
-    const request = this.context
-      .switchToHttp()
-      .getRequest<FastifyRequestWithUser>()
+    const request = this.context.switchToHttp().getRequest<FastifyRequestWithUser>()
 
     if (!request.headers['authorization']) {
       throw new UnauthorizedException()
