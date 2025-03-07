@@ -1,6 +1,6 @@
 import { EventTypeEnum } from '@domain/events/entities/event-type.enum'
 import { EventEntity } from '@domain/events/entities/event.entity'
-import { TicketCreatedEvent } from '@domain/ticket/domain/ticket-created.event'
+import { TicketCreatedEvent } from '@domain/ticket/domain/events/ticket-created.event'
 import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
 import { TicketStatusEnum } from '@domain/ticket/domain/ticket.status.enum'
 import { BadRequestException } from '@nestjs/common'

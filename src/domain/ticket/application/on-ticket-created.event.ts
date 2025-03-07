@@ -1,4 +1,4 @@
-import { TicketCreatedEvent } from '@domain/ticket/domain/ticket-created.event'
+import { TicketCreatedEvent } from '@domain/ticket/domain/events/ticket-created.event'
 import { Logger } from '@nestjs/common'
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
 

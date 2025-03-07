@@ -24,45 +24,34 @@ export class GeneratePaymentCheckoutCommandHandler
 {
   constructor(
     @InjectRepository(PaymentEntity)
-    private readonly payments: Repository<PaymentEntity>,
-    private readonly paymentGateway: PaymentGateway,
+    private readonly paymentRepository: Repository<PaymentEntity>,
     @InjectRepository(UserEntity)
-    private readonly users: Repository<UserEntity>,
+    private readonly usersRepository: Repository<UserEntity>,
+
+    private readonly paymentGateway: PaymentGateway,
   ) {}
 
   async execute({ ticketId, userId }: GeneratePaymentCheckoutCommand): Promise<{
     paymentUrl: string
   }> {
-    const alreadyExistsPaymentForThisTicket = await this.payments.findOne({
-      where: {
-        ticketId,
-      },
-    })
-
-    if (alreadyExistsPaymentForThisTicket) {
-      throw new BadRequestException('Payment already exists for this ticket')
-    }
-
-    const user = await this.users.findOne({ where: { id: userId } })
+    const user = await this.usersRepository.findOne({ where: { id: userId } })
 
     if (!user) {
       throw new BadRequestException('User not found')
     }
 
-    const payment = this.payments.create({
+    const payment = this.paymentRepository.create({
       ticketId,
       userId: user.id,
       status: PaymentStatus.PENDING,
     })
 
-    await this.payments.save(payment)
+    await this.paymentRepository.save(payment)
 
     const paymentUrl = await this.paymentGateway.generatePaymentUrl(
       payment.id,
       user.email,
     )
-
-    payment.commit()
 
     return {
       paymentUrl,

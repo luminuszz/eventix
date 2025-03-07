@@ -4,7 +4,7 @@ import { EventEntity } from 'src/domain/events/entities/event.entity'
 import { EnvModule } from '../env/env.module'
 import { EnvService } from '../env/env.service'
 
-Global()
+@Global()
 @Module({
   imports: [
     EnvModule,

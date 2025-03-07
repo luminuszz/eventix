@@ -1,11 +1,10 @@
+import { DomainEvent } from '@domain/shared/domain.event'
 import { AggregateRoot } from '@nestjs/cqrs'
 import {
   CreateDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-
-export class DomainEvent {}
 
 export class DomainEntity extends AggregateRoot<DomainEvent> {
   constructor() {
