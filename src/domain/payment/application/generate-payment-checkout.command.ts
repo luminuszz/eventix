@@ -1,11 +1,11 @@
-import {PaymentGateway} from '@domain/payment/application/contracts/payment-gateway'
-import {InvalidPaymentOperationError} from '@domain/payment/application/errors/invalid-payment-operation.error'
-import {PaymentStatus} from '@domain/payment/domain/payment-status.enum'
-import {PaymentEntity} from '@domain/payment/domain/payment.entity'
-import {UserEntity} from '@domain/users/domain/users.entity'
-import {Command, CommandHandler, ICommandHandler} from '@nestjs/cqrs'
-import {InjectRepository} from '@nestjs/typeorm'
-import {Repository} from 'typeorm'
+import { PaymentGateway } from '@domain/payment/application/contracts/payment-gateway'
+import { InvalidPaymentOperationError } from '@domain/payment/application/errors/invalid-payment-operation.error'
+import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
+import { PaymentEntity } from '@domain/payment/domain/payment.entity'
+import { UserEntity } from '@domain/users/domain/users.entity'
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 export class GeneratePaymentCheckoutCommand extends Command<{
   paymentUrl: string
@@ -34,11 +34,7 @@ export class GeneratePaymentCheckoutCommandHandler
   async execute({ ticketId, userId }: GeneratePaymentCheckoutCommand): Promise<{
     paymentUrl: string
   }> {
-    const user = await this.usersRepository.findOne({ where: { id: userId } })
-
-    if (!user) {
-      throw new InvalidPaymentOperationError('User not found')
-    }
+    const user = await this.usersRepository.findOneOrFail({ where: { id: userId } })
 
     let payment: PaymentEntity
 

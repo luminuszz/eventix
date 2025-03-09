@@ -1,10 +1,10 @@
-import {HashProvider} from '@domain/users/contracts/hash.provider'
-import {UserCreatedEvent} from '@domain/users/domain/events/user-created.event'
-import {BadRequestException} from '@nestjs/common'
-import {CommandHandler, EventPublisher, ICommandHandler} from '@nestjs/cqrs'
-import {InjectRepository} from '@nestjs/typeorm'
-import {Repository} from 'typeorm'
-import {UserEntity} from '../../domain/users.entity'
+import { InvalidUserOperationError } from '@domain/users/application/errors/invalid-user-operation.error'
+import { HashProvider } from '@domain/users/contracts/hash.provider'
+import { UserCreatedEvent } from '@domain/users/domain/events/user-created.event'
+import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { UserEntity } from '../../domain/users.entity'
 
 export class CreateUserCommand {
   constructor(
@@ -32,7 +32,7 @@ export class CreateUserCommandHandler implements ICommandHandler<CreateUserComma
     })
 
     if (userExists) {
-      throw new BadRequestException('User already exists')
+      throw new InvalidUserOperationError('User already exists')
     }
 
     const passwordHash = await this.hashProvider.hash(payload.password)

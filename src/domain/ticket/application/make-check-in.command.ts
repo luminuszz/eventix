@@ -22,7 +22,7 @@ export class MakeCheckInCommandHandler implements ICommandHandler<MakeCheckInCom
   ) {}
 
   async execute({ userId, ticketId }: MakeCheckInCommand): Promise<void> {
-    const ticket = await this.ticketRepository.findOne({
+    const ticket = await this.ticketRepository.findOneOrFail({
       where: {
         id: ticketId,
       },
@@ -30,8 +30,6 @@ export class MakeCheckInCommandHandler implements ICommandHandler<MakeCheckInCom
         event: true,
       },
     })
-
-    if (!ticket) throw new BadRequestException('Ticket not found')
 
     const userIsEventOwner = ticket.event.ownerId === userId
 
