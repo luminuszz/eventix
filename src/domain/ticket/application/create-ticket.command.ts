@@ -1,12 +1,12 @@
-import { EventTypeEnum } from '@domain/events/entities/event-type.enum'
-import { EventEntity } from '@domain/events/entities/event.entity'
-import { TicketCreatedEvent } from '@domain/ticket/domain/events/ticket-created.event'
-import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
-import { TicketStatusEnum } from '@domain/ticket/domain/ticket.status.enum'
-import { BadRequestException } from '@nestjs/common'
-import { Command, CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import {EventTypeEnum} from '@domain/events/domain/entities/event-type.enum'
+import {EventEntity} from '@domain/events/domain/entities/event.entity'
+import {TicketCreatedEvent} from '@domain/ticket/domain/events/ticket-created.event'
+import {TicketEntity} from '@domain/ticket/domain/ticket.entity'
+import {TicketStatusEnum} from '@domain/ticket/domain/ticket.status.enum'
+import {BadRequestException} from '@nestjs/common'
+import {Command, CommandHandler, EventPublisher, ICommandHandler} from '@nestjs/cqrs'
+import {InjectRepository} from '@nestjs/typeorm'
+import {Repository} from 'typeorm'
 
 export class CreateTicketCommand extends Command<void> {
   constructor(

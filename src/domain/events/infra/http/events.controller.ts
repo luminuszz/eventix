@@ -1,9 +1,9 @@
-import { User } from '@domain/users/infra/http/user-auth.decorator'
-import { Body, Controller, Get, Post } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { CreateEventCommand } from '../commands/create-event.command'
-import { FetchEventsQuery } from '../queries/fetch-events.query'
-import { CreateEventDto } from './dto/create-event.dto'
+import {CreateEventCommand} from '@domain/events/application/commands/create-event.command'
+import {FetchEventsQuery} from '@domain/events/application/queries/fetch-events.query'
+import {User} from '@domain/users/infra/http/user-auth.decorator'
+import {Body, Controller, Get, Post} from '@nestjs/common'
+import {CommandBus, QueryBus} from '@nestjs/cqrs'
+import {CreateEventDto} from './dto/create-event.dto'
 
 @Controller('events')
 export class EventController {
@@ -21,6 +21,7 @@ export class EventController {
         userId,
         data.maxCapacity,
         data.type,
+        data.price,
       ),
     )
   }

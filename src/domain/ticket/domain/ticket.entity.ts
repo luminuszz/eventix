@@ -1,4 +1,4 @@
-import { EventEntity } from '@domain/events/entities/event.entity'
+import { EventEntity } from '@domain/events/domain/entities/event.entity'
 import { DomainEntity } from '@domain/shared/domain.entity'
 import { TicketApprovedEvent } from '@domain/ticket/domain/events/ticket-approved.event'
 import { TicketCheckedInEvent } from '@domain/ticket/domain/events/ticket-checked-in.event'

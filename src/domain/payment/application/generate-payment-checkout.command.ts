@@ -1,11 +1,11 @@
-import { PaymentGateway } from '@domain/payment/application/contracts/payment-gateway'
-import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
-import { PaymentEntity } from '@domain/payment/domain/payment.entity'
-import { UserEntity } from '@domain/users/domain/users.entity'
-import { BadRequestException } from '@nestjs/common'
-import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import {PaymentGateway} from '@domain/payment/application/contracts/payment-gateway'
+import {InvalidPaymentOperationError} from '@domain/payment/application/errors/invalid-payment-operation.error'
+import {PaymentStatus} from '@domain/payment/domain/payment-status.enum'
+import {PaymentEntity} from '@domain/payment/domain/payment.entity'
+import {UserEntity} from '@domain/users/domain/users.entity'
+import {Command, CommandHandler, ICommandHandler} from '@nestjs/cqrs'
+import {InjectRepository} from '@nestjs/typeorm'
+import {Repository} from 'typeorm'
 
 export class GeneratePaymentCheckoutCommand extends Command<{
   paymentUrl: string
@@ -37,18 +37,52 @@ export class GeneratePaymentCheckoutCommandHandler
     const user = await this.usersRepository.findOne({ where: { id: userId } })
 
     if (!user) {
-      throw new BadRequestException('User not found')
+      throw new InvalidPaymentOperationError('User not found')
     }
 
-    const payment = this.paymentRepository.create({
-      ticketId,
-      userId: user.id,
-      status: PaymentStatus.PENDING,
+    let payment: PaymentEntity
+
+    const existsPayment = await this.paymentRepository.findOne({
+      where: { ticketId },
+      relations: {
+        ticket: true,
+      },
     })
 
-    await this.paymentRepository.save(payment)
+    if (!existsPayment) {
+      const paymentModel = this.paymentRepository.create({
+        ticketId,
+        userId: user.id,
+        status: PaymentStatus.PENDING,
+      })
 
-    const paymentUrl = await this.paymentGateway.generatePaymentUrl(payment.id, user.email)
+      await this.paymentRepository.save(paymentModel)
+
+      const createdPayment = await this.paymentRepository.findOne({
+        where: { id: paymentModel.id },
+        relations: {
+          ticket: true,
+        },
+      })
+
+      if (!createdPayment) {
+        throw new InvalidPaymentOperationError('Payment not found')
+      }
+
+      payment = createdPayment
+    } else {
+      if (existsPayment.status === PaymentStatus.PAID) {
+        throw new InvalidPaymentOperationError('Payment already paid')
+      }
+
+      payment = existsPayment
+    }
+
+    const paymentUrl = await this.paymentGateway.generateByProductPaymentUrl({
+      paymentId: payment.id,
+      userEmail: user.email,
+      eventId: payment.ticket.eventId,
+    })
 
     return {
       paymentUrl,

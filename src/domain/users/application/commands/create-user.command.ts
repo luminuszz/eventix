@@ -1,9 +1,10 @@
-import { HashProvider } from '@domain/users/contracts/hash.provider'
-import { BadRequestException } from '@nestjs/common'
-import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { UserEntity } from '../../domain/users.entity'
+import {HashProvider} from '@domain/users/contracts/hash.provider'
+import {UserCreatedEvent} from '@domain/users/domain/events/user-created.event'
+import {BadRequestException} from '@nestjs/common'
+import {CommandHandler, EventPublisher, ICommandHandler} from '@nestjs/cqrs'
+import {InjectRepository} from '@nestjs/typeorm'
+import {Repository} from 'typeorm'
+import {UserEntity} from '../../domain/users.entity'
 
 export class CreateUserCommand {
   constructor(
@@ -17,9 +18,7 @@ export class CreateUserCommand {
 }
 
 @CommandHandler(CreateUserCommand)
-export class CreateUserCommandHandler
-  implements ICommandHandler<CreateUserCommand>
-{
+export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -46,6 +45,8 @@ export class CreateUserCommandHandler
         lastName: payload.lastName,
       }),
     )
+
+    newUser.apply(new UserCreatedEvent(newUser))
 
     await this.userRepository.save(newUser)
 

@@ -1,29 +1,76 @@
-import { PaymentGateway } from '@domain/payment/application/contracts/payment-gateway'
-import { EnvService } from '@infra/env/env.service'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  CreateProductDto,
+  GenerateProductPaymentUrlDto,
+  PaymentGateway,
+  RegisterCostumerDto,
+} from '@domain/payment/application/contracts/payment-gateway'
+import {EnvService} from '@infra/env/env.service'
+import {BadRequestException, Injectable} from '@nestjs/common'
 import Stripe from 'stripe'
 
 @Injectable()
 export class StripePaymentGatewayProvider implements PaymentGateway {
   private readonly stripe: Stripe
-  private readonly priceId: string
 
   constructor(private readonly env: EnvService) {
     this.stripe = new Stripe(env.get('STRIPE_PRIVATE_API_KEY'))
-    this.priceId = env.get('STRIPE_PRICE_ID')
   }
 
-  async generatePaymentUrl(paymentId: string, email: string): Promise<string> {
+  async createProduct(dto: CreateProductDto): Promise<void> {
+    await this.stripe.products.create({
+      name: dto.name,
+      active: true,
+      id: dto.id,
+      default_price_data: {
+        currency: 'BRL',
+        unit_amount: dto.price,
+      },
+    })
+  }
+
+  public buildWebhookEvent(body: string | Buffer, signature: string): Stripe.Event {
+    return this.stripe.webhooks.constructEvent(
+      body,
+      signature,
+      this.env.get('STRIPE_WEBHOOK_SECRET'),
+    )
+  }
+
+  async registerCostumer(dto: RegisterCostumerDto): Promise<void> {
+    await this.stripe.customers.create({
+      name: dto.name,
+      email: dto.email,
+      metadata: {
+        userid: dto.id,
+      },
+    })
+  }
+  async generateByProductPaymentUrl(dto: GenerateProductPaymentUrlDto): Promise<string> {
+    const product = await this.stripe.products.retrieve(dto.eventId)
+
+    if (!product) {
+      throw new BadRequestException('Stripe error: Product not found')
+    }
+
+    const { data: customerList } = await this.stripe.customers.list({
+      email: dto.userEmail,
+    })
+
+    const customer = customerList.find((item) => item.email === dto.userEmail)
+
+    if (!customer) {
+      throw new BadRequestException('Stripe error: Customer not found')
+    }
+
     const session = await this.stripe.checkout.sessions.create({
-      customer_email: email,
+      customer: customer.id,
       mode: 'payment',
       currency: 'BRL',
-      payment_method_types: ['card', 'boleto'],
-      client_reference_id: paymentId,
-      customer_creation: 'if_required',
+      payment_method_types: ['card'],
+      client_reference_id: dto.paymentId,
       line_items: [
         {
-          price: this.priceId,
+          price: product.default_price as string,
           quantity: 1,
           adjustable_quantity: {
             enabled: false,
@@ -39,13 +86,5 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
     }
 
     return session.url
-  }
-
-  public buildWebhookEvent(body: string | Buffer, signature: string): Stripe.Event {
-    return this.stripe.webhooks.constructEvent(
-      body,
-      signature,
-      this.env.get('STRIPE_WEBHOOK_SECRET'),
-    )
   }
 }

@@ -1,6 +1,6 @@
 import { UserEntity } from '@domain/users/domain/users.entity'
 
-import { EventTypeEnum } from '@domain/events/entities/event-type.enum'
+import { EventTypeEnum } from '@domain/events/domain/entities/event-type.enum'
 import { DomainEntity } from '@domain/shared/domain.entity'
 import { Column, Entity, ManyToOne } from 'typeorm'
 

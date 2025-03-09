@@ -1,21 +1,14 @@
-import { GeneratePaymentCheckoutCommand } from '@domain/payment/application/generate-payment-checkout.command'
-import { UpdatePaymentStatusCommand } from '@domain/payment/application/update-payment-status.command'
-import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
-import { GeneratePaymentCheckoutDto } from '@domain/payment/infra/http/validators/generate-payment-checkout.dto'
-import { StripePaymentGatewayProvider } from '@domain/payment/infra/stripe/stripe-payment-gateway.provider'
-import { parseStripeCheckoutSessionSchema } from '@domain/payment/infra/stripe/stripe.schema'
-import { IsPublic } from '@domain/users/application/auth.guard'
-import { User } from '@domain/users/infra/http/user-auth.decorator'
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Post,
-  RawBodyRequest,
-  Req,
-} from '@nestjs/common'
-import { CommandBus } from '@nestjs/cqrs'
-import { FastifyRequest } from 'fastify'
+import {GeneratePaymentCheckoutCommand} from '@domain/payment/application/generate-payment-checkout.command'
+import {UpdatePaymentStatusCommand} from '@domain/payment/application/update-payment-status.command'
+import {PaymentStatus} from '@domain/payment/domain/payment-status.enum'
+import {GeneratePaymentCheckoutDto} from '@domain/payment/infra/http/validators/generate-payment-checkout.dto'
+import {StripePaymentGatewayProvider} from '@domain/payment/infra/stripe/stripe-payment-gateway.provider'
+import {parseStripeCheckoutSessionSchema} from '@domain/payment/infra/stripe/stripe.schema'
+import {IsPublic} from '@domain/users/infra/auth.guard'
+import {User} from '@domain/users/infra/http/user-auth.decorator'
+import {BadRequestException, Body, Controller, Post, RawBodyRequest, Req} from '@nestjs/common'
+import {CommandBus} from '@nestjs/cqrs'
+import {FastifyRequest} from 'fastify'
 
 @Controller('payment')
 export class PaymentController {
@@ -25,10 +18,7 @@ export class PaymentController {
   ) {}
 
   @Post('checkout')
-  async postCheckout(
-    @Body() dto: GeneratePaymentCheckoutDto,
-    @User('id') userId: string,
-  ) {
+  async postCheckout(@Body() dto: GeneratePaymentCheckoutDto, @User('id') userId: string) {
     const { paymentUrl } = await this.commandBus.execute(
       new GeneratePaymentCheckoutCommand(userId, dto.ticketId),
     )
@@ -49,15 +39,13 @@ export class PaymentController {
     )
 
     if (event.type === 'checkout.session.completed') {
-      const { client_reference_id, status } =
-        parseStripeCheckoutSessionSchema.parse(event.data.object)
+      const { client_reference_id, status } = parseStripeCheckoutSessionSchema.parse(
+        event.data.object,
+      )
 
       if (status === 'complete') {
         await this.commandBus.execute(
-          new UpdatePaymentStatusCommand(
-            PaymentStatus.PAID,
-            client_reference_id,
-          ),
+          new UpdatePaymentStatusCommand(PaymentStatus.PAID, client_reference_id),
         )
       }
     }

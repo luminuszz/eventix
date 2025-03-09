@@ -1,14 +1,9 @@
-import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
-import { PaymentEntity } from '@domain/payment/domain/payment.entity'
-import { BadRequestException } from '@nestjs/common'
-import {
-  Command,
-  CommandHandler,
-  EventPublisher,
-  ICommandHandler,
-} from '@nestjs/cqrs'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import {PaymentStatus} from '@domain/payment/domain/payment-status.enum'
+import {PaymentEntity} from '@domain/payment/domain/payment.entity'
+import {BadRequestException} from '@nestjs/common'
+import {Command, CommandHandler, EventPublisher, ICommandHandler} from '@nestjs/cqrs'
+import {InjectRepository} from '@nestjs/typeorm'
+import {Repository} from 'typeorm'
 
 export class UpdatePaymentStatusCommand extends Command<{ actionId: string }> {
   constructor(
@@ -29,10 +24,7 @@ export class UpdatePaymentStatusCommandHandler
     private readonly publisher: EventPublisher,
   ) {}
 
-  async execute({
-    paymentId,
-    status,
-  }: UpdatePaymentStatusCommand): Promise<{ actionId: string }> {
+  async execute({ paymentId, status }: UpdatePaymentStatusCommand): Promise<{ actionId: string }> {
     const payment = await this.paymentRepository.findOne({
       where: { id: paymentId },
       relations: {

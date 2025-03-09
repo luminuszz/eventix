@@ -1,8 +1,8 @@
-import { Global, Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { EventEntity } from 'src/domain/events/entities/event.entity'
-import { EnvModule } from '../env/env.module'
-import { EnvService } from '../env/env.service'
+import {EventEntity} from '@domain/events/domain/entities/event.entity'
+import {Global, Module} from '@nestjs/common'
+import {TypeOrmModule} from '@nestjs/typeorm'
+import {EnvModule} from '../env/env.module'
+import {EnvService} from '../env/env.service'
 
 @Global()
 @Module({
