@@ -24,22 +24,22 @@ export class UpdatePaymentStatusCommandHandler
   ) {}
 
   async execute({ paymentId, status }: UpdatePaymentStatusCommand): Promise<{ actionId: string }> {
-    const payment = await this.paymentRepository.findOneOrFail({
-      where: { id: paymentId },
-      relations: {
-        ticket: true,
-      },
-    })
-
-    const paymentModel = this.publisher.mergeObjectContext(payment)
+    const payment = this.publisher.mergeObjectContext(
+      await this.paymentRepository.findOneOrFail({
+        where: { id: paymentId },
+        relations: {
+          ticket: true,
+        },
+      }),
+    )
 
     if (status === 'paid') {
-      paymentModel.markAsPaid()
+      payment.confirm()
     }
 
-    await this.paymentRepository.save(paymentModel)
+    await this.paymentRepository.save(payment)
 
-    paymentModel.commit()
+    payment.commit()
 
     return {
       actionId: crypto.randomUUID(),

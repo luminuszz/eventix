@@ -23,7 +23,7 @@ export class PaymentEntity extends DomainEntity {
   @ManyToOne(() => UserEntity)
   user: UserEntity
 
-  markAsPaid() {
+  confirm() {
     if (this.status === PaymentStatus.PAID) {
       throw new InvalidPaymentOperationError('Payment already paid')
     }
@@ -31,5 +31,13 @@ export class PaymentEntity extends DomainEntity {
     this.status = PaymentStatus.PAID
 
     this.apply(new PaymentConfirmedEvent(this))
+  }
+
+  get isPaid() {
+    return this.status === PaymentStatus.PAID
+  }
+
+  get isCancelled() {
+    return this.status === PaymentStatus.CANCELED
   }
 }

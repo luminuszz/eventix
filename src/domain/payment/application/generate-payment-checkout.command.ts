@@ -67,7 +67,7 @@ export class GeneratePaymentCheckoutCommandHandler
 
       payment = createdPayment
     } else {
-      if (existsPayment.status === PaymentStatus.PAID) {
+      if (existsPayment.isPaid) {
         throw new InvalidPaymentOperationError('Payment already paid')
       }
 
