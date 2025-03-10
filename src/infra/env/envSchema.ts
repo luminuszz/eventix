@@ -7,6 +7,8 @@ export const envSchema = z.object({
   JWT_SECRET: z.string(),
   STRIPE_PRIVATE_API_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
+  REDIS_PORT: z.coerce.number(),
+  REDIS_HOST: z.string(),
 })
 
 export type EnvConfig = z.infer<typeof envSchema>

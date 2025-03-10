@@ -1,8 +1,7 @@
 import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
-import { PaymentEntity } from '@domain/payment/domain/payment.entity'
-import { Command, CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { InjectQueue } from '@nestjs/bullmq'
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { Queue } from 'bullmq'
 
 export class UpdatePaymentStatusCommand extends Command<{ actionId: string }> {
   constructor(
@@ -18,28 +17,15 @@ export class UpdatePaymentStatusCommandHandler
   implements ICommandHandler<UpdatePaymentStatusCommand>
 {
   constructor(
-    @InjectRepository(PaymentEntity)
-    private readonly paymentRepository: Repository<PaymentEntity>,
-    private readonly publisher: EventPublisher,
+    @InjectQueue('payment')
+    private processPaymentQueue: Queue<UpdatePaymentStatusCommand>,
   ) {}
 
   async execute({ paymentId, status }: UpdatePaymentStatusCommand): Promise<{ actionId: string }> {
-    const payment = this.publisher.mergeObjectContext(
-      await this.paymentRepository.findOneOrFail({
-        where: { id: paymentId },
-        relations: {
-          ticket: true,
-        },
-      }),
+    await this.processPaymentQueue.add(
+      'process-payment-status',
+      new UpdatePaymentStatusCommand(status, paymentId),
     )
-
-    if (status === 'paid') {
-      payment.confirm()
-    }
-
-    await this.paymentRepository.save(payment)
-
-    payment.commit()
 
     return {
       actionId: crypto.randomUUID(),
