@@ -1,9 +1,10 @@
 import { DomainEntity } from '@domain/shared/domain.entity'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 
 @Entity('users')
 export class UserEntity extends DomainEntity {
   @Column({ unique: true, nullable: false })
+  @Index()
   email: string
 
   @Column({ nullable: false })

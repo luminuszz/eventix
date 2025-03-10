@@ -6,7 +6,6 @@ export const envSchema = z.object({
   ENVIRONMENT: z.enum(['development', 'production']),
   JWT_SECRET: z.string(),
   STRIPE_PRIVATE_API_KEY: z.string(),
-  STRIPE_PRICE_ID: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
 })
 

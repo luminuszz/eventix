@@ -4,8 +4,8 @@ import {
   PaymentGateway,
   RegisterCostumerDto,
 } from '@domain/payment/application/contracts/payment-gateway'
-import {EnvService} from '@infra/env/env.service'
-import {BadRequestException, Injectable} from '@nestjs/common'
+import { EnvService } from '@infra/env/env.service'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import Stripe from 'stripe'
 
 @Injectable()
@@ -45,18 +45,22 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
       },
     })
   }
-  async generateByProductPaymentUrl(dto: GenerateProductPaymentUrlDto): Promise<string> {
-    const product = await this.stripe.products.retrieve(dto.eventId)
+  async generatePaymentUrlByProduct({
+    paymentId,
+    userEmail,
+    eventId,
+  }: GenerateProductPaymentUrlDto): Promise<string> {
+    const product = await this.stripe.products.retrieve(eventId)
 
     if (!product) {
       throw new BadRequestException('Stripe error: Product not found')
     }
 
     const { data: customerList } = await this.stripe.customers.list({
-      email: dto.userEmail,
+      email: userEmail,
     })
 
-    const customer = customerList.find((item) => item.email === dto.userEmail)
+    const customer = customerList.find((item) => item.email === userEmail)
 
     if (!customer) {
       throw new BadRequestException('Stripe error: Customer not found')
@@ -67,7 +71,7 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
       mode: 'payment',
       currency: 'BRL',
       payment_method_types: ['card'],
-      client_reference_id: dto.paymentId,
+      client_reference_id: paymentId,
       line_items: [
         {
           price: product.default_price as string,

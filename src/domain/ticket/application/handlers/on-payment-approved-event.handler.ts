@@ -16,18 +16,15 @@ export class OnPaymentApprovedEventHandler implements IEventHandler<PaymentConfi
   ) {}
 
   async handle({ payment }: PaymentConfirmedEvent) {
-    this.logger.log('Handling event: PaymentConfirmedEvent')
-
-    const ticket = await this.ticketRepository.findOneOrFail({
-      where: { id: payment.ticketId },
-    })
-
-    const ticketModel = this.publisher.mergeObjectContext(ticket)
-
-    ticketModel.aprove()
+    const ticket = this.publisher.mergeObjectContext(
+      await this.ticketRepository.findOneOrFail({
+        where: { id: payment.ticketId },
+      }),
+    )
+    ticket.aprove()
 
     await this.ticketRepository.save(ticket)
 
-    ticketModel.commit()
+    ticket.commit()
   }
 }

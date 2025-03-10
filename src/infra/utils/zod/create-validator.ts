@@ -23,5 +23,5 @@ export function createZodValidator<SchemaType extends ZodSchema>(schema: SchemaT
 }
 
 export function isZodValidator(metadata: unknown): metadata is zodValidator<unknown, unknown> {
-  return (metadata as zodValidator<unknown, unknown>).isZodDto
+  return (metadata as zodValidator<unknown, unknown>)?.isZodDto
 }

@@ -17,7 +17,7 @@ export interface GenerateProductPaymentUrlDto {
 }
 
 export abstract class PaymentGateway {
-  abstract generateByProductPaymentUrl(dto: GenerateProductPaymentUrlDto): Promise<string>
+  abstract generatePaymentUrlByProduct(dto: GenerateProductPaymentUrlDto): Promise<string>
   abstract createProduct(dto: CreateProductDto): Promise<void>
   abstract registerCostumer(dto: RegisterCostumerDto): Promise<void>
 }

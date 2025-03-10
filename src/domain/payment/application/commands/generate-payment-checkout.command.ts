@@ -74,7 +74,7 @@ export class GeneratePaymentCheckoutCommandHandler
       payment = existsPayment
     }
 
-    const paymentUrl = await this.paymentGateway.generateByProductPaymentUrl({
+    const paymentUrl = await this.paymentGateway.generatePaymentUrlByProduct({
       paymentId: payment.id,
       userEmail: user.email,
       eventId: payment.ticket.eventId,
