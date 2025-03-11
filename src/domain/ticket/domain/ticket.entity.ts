@@ -4,7 +4,7 @@ import { TicketApprovedEvent } from '@domain/ticket/domain/events/ticket-approve
 import { TicketCheckedInEvent } from '@domain/ticket/domain/events/ticket-checked-in.event'
 import { TicketStatusEnum } from '@domain/ticket/domain/ticket.status.enum'
 import { UserEntity } from '@domain/users/domain/users.entity'
-import { Column, Entity, ManyToOne } from 'typeorm'
+import { Column, Entity, ManyToOne, Relation } from 'typeorm'
 
 @Entity('tickets')
 export class TicketEntity extends DomainEntity {
@@ -36,8 +36,8 @@ export class TicketEntity extends DomainEntity {
   }
 
   @ManyToOne(() => UserEntity)
-  user: UserEntity
+  user: Relation<UserEntity>
 
   @ManyToOne(() => EventEntity)
-  event: EventEntity
+  event: Relation<EventEntity>
 }

@@ -3,6 +3,7 @@ import {
   GenerateProductPaymentUrlDto,
   PaymentGateway,
   RegisterCostumerDto,
+  UpdateProductDetailsDto,
 } from '@domain/payment/application/contracts/payment-gateway'
 import { EnvService } from '@infra/env/env.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
@@ -14,6 +15,13 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
 
   constructor(private readonly env: EnvService) {
     this.stripe = new Stripe(env.get('STRIPE_PRIVATE_API_KEY'))
+  }
+
+  async updateProductDetails(dto: UpdateProductDetailsDto): Promise<void> {
+    await this.stripe.products.update(dto.eventId, {
+      name: dto.name,
+      description: dto.description,
+    })
   }
 
   async createProduct(dto: CreateProductDto): Promise<void> {

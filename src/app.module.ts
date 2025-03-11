@@ -1,4 +1,3 @@
-import { EventEntity } from '@domain/events/domain/entities/event.entity'
 import { EventsModule } from '@domain/events/infra/events.module'
 import { PaymentModule } from '@domain/payment/infra/payment.module'
 import { TicketModule } from '@domain/ticket/infra/ticket.module'
@@ -33,7 +32,6 @@ import { TypeOrmModule } from '@nestjs/typeorm'
         return {
           type: 'postgres',
           url: env.get('DB_URL'),
-          entities: [EventEntity],
           autoLoadEntities: true,
           synchronize: isDev,
           logging: isDev,

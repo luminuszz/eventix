@@ -4,7 +4,7 @@ import { PaymentStatus } from '@domain/payment/domain/payment-status.enum'
 import { DomainEntity } from '@domain/shared/domain.entity'
 import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
 import { UserEntity } from '@domain/users/domain/users.entity'
-import { Column, Entity, ManyToOne } from 'typeorm'
+import { Column, Entity, ManyToOne, Relation } from 'typeorm'
 
 @Entity('payments')
 export class PaymentEntity extends DomainEntity {
@@ -21,7 +21,7 @@ export class PaymentEntity extends DomainEntity {
   ticket: TicketEntity
 
   @ManyToOne(() => UserEntity)
-  user: UserEntity
+  user: Relation<UserEntity>
 
   confirm() {
     if (this.status === PaymentStatus.PAID) {
