@@ -4,6 +4,7 @@ import {
   PaymentGateway,
   RegisterCostumerDto,
   UpdateProductDetailsDto,
+  UpdateProductPriceDto,
 } from '@domain/payment/application/contracts/payment-gateway'
 import { EnvService } from '@infra/env/env.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
@@ -13,8 +14,22 @@ import Stripe from 'stripe'
 export class StripePaymentGatewayProvider implements PaymentGateway {
   private readonly stripe: Stripe
 
+  private readonly currency = 'BRL' as const
+
   constructor(private readonly env: EnvService) {
     this.stripe = new Stripe(env.get('STRIPE_PRIVATE_API_KEY'))
+  }
+
+  async updateProductPrice(dto: UpdateProductPriceDto): Promise<void> {
+    const newPrice = await this.stripe.prices.create({
+      product: dto.eventId,
+      unit_amount: dto.price,
+      currency: this.currency,
+    })
+
+    await this.stripe.products.update(dto.eventId, {
+      default_price: newPrice.id,
+    })
   }
 
   async updateProductDetails(dto: UpdateProductDetailsDto): Promise<void> {
@@ -30,7 +45,7 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
       active: true,
       id: dto.id,
       default_price_data: {
-        currency: 'BRL',
+        currency: this.currency,
         unit_amount: dto.price,
       },
     })
@@ -77,7 +92,7 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
     const session = await this.stripe.checkout.sessions.create({
       customer: customer.id,
       mode: 'payment',
-      currency: 'BRL',
+      currency: this.currency,
       payment_method_types: ['card'],
       client_reference_id: paymentId,
       line_items: [

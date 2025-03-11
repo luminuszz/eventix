@@ -3,6 +3,7 @@ import { UpdatePaymentStatusCommandHandler } from '@domain/payment/application/c
 import { ProcessPaymentConsumer } from '@domain/payment/application/consumers/process-payment.consumer'
 import { PaymentGateway } from '@domain/payment/application/contracts/payment-gateway'
 import { OnEventCreatedEventHandler } from '@domain/payment/application/handlers/on-event-created-event.handler'
+import { OnEventPriceUpdatedEventHandler } from '@domain/payment/application/handlers/on-event-price-updated-event.handler'
 import { OnEventUpdatedHandler } from '@domain/payment/application/handlers/on-event-updated.handler'
 import { OnUserCreatedEventHandler } from '@domain/payment/application/handlers/on-user-created-event.handler'
 import { PaymentEntity } from '@domain/payment/domain/payment.entity'
@@ -31,6 +32,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
     GeneratePaymentCheckoutCommandHandler,
     UpdatePaymentStatusCommandHandler,
     ProcessPaymentConsumer,
+    OnEventPriceUpdatedEventHandler,
     OnEventUpdatedHandler,
   ],
   controllers: [PaymentController],

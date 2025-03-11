@@ -1,6 +1,7 @@
 import { UserEntity } from '@domain/users/domain/users.entity'
 
 import { EventTypeEnum } from '@domain/events/domain/entities/event-type.enum'
+import { EventPriceUpdatedEvent } from '@domain/events/domain/events/event-price-updated.event'
 import { DomainEntity } from '@domain/shared/domain.entity'
 import { DomainError } from '@domain/shared/domain.error'
 import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
@@ -48,5 +49,19 @@ export class EventEntity extends DomainEntity {
     }
 
     this.maxCapacity = capacity
+  }
+
+  changePrice(price: number) {
+    if (this.type === EventTypeEnum.FREE) {
+      throw new DomainError('Cannot change price of a free event')
+    }
+
+    if (price <= 0) {
+      throw new DomainError('Price must be greater than 0')
+    }
+
+    this.price = price
+
+    this.apply(new EventPriceUpdatedEvent(this))
   }
 }

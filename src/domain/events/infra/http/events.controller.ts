@@ -1,7 +1,9 @@
 import { CreateEventCommand } from '@domain/events/application/commands/create-event.command'
-import { UpdateEventCommand } from '@domain/events/application/commands/update-event.command'
+import { UpdateEventDetailsCommand } from '@domain/events/application/commands/update-event-details.command'
+import { UpdateEventPriceCommand } from '@domain/events/application/commands/update-event-price.command'
 import { FetchEventsQuery } from '@domain/events/application/queries/fetch-events.query'
 import { UpdateEventDto } from '@domain/events/infra/http/dto/update-event.dto'
+import { UpdatePriceEventDto } from '@domain/events/infra/http/dto/update-price-event.dto'
 import { User } from '@domain/users/infra/http/user-auth.decorator'
 import { ParseUUIDPipePipe } from '@infra/utils/parse-uuid.pipe'
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
@@ -42,6 +44,15 @@ export class EventController {
     @User('id') userId: string,
     @Param('id', ParseUUIDPipePipe) eventId: string,
   ) {
-    await this.commandBus.execute(new UpdateEventCommand(eventId, userId, data))
+    await this.commandBus.execute(new UpdateEventDetailsCommand(eventId, userId, data))
+  }
+
+  @Put('/:id/price')
+  async updateEventPrice(
+    @Body() dto: UpdatePriceEventDto,
+    @Param('id', ParseUUIDPipePipe) eventId: string,
+    @User('id') userId: string,
+  ) {
+    await this.commandBus.execute(new UpdateEventPriceCommand(userId, eventId, dto.price))
   }
 }
