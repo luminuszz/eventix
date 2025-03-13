@@ -1,7 +1,9 @@
 import { CreateEventCommand } from '@domain/events/application/commands/create-event.command'
+import { RegisterEventAddressCommand } from '@domain/events/application/commands/register-event-address.command'
 import { UpdateEventDetailsCommand } from '@domain/events/application/commands/update-event-details.command'
 import { UpdateEventPriceCommand } from '@domain/events/application/commands/update-event-price.command'
 import { FetchEventsQuery } from '@domain/events/application/queries/fetch-events.query'
+import { RegisterEventAddressDto } from '@domain/events/infra/http/dto/register-event-address.dto'
 import { UpdateEventDto } from '@domain/events/infra/http/dto/update-event.dto'
 import { UpdatePriceEventDto } from '@domain/events/infra/http/dto/update-price-event.dto'
 import { User } from '@domain/users/infra/http/user-auth.decorator'
@@ -54,5 +56,14 @@ export class EventController {
     @User('id') userId: string,
   ) {
     await this.commandBus.execute(new UpdateEventPriceCommand(userId, eventId, dto.price))
+  }
+
+  @Post('/:id/address')
+  async registerEventAddress(
+    @Body() body: RegisterEventAddressDto,
+    @Param('id', ParseUUIDPipePipe) eventId: string,
+    @User('id') userId: string,
+  ) {
+    await this.commandBus.execute(new RegisterEventAddressCommand(userId, eventId, body))
   }
 }

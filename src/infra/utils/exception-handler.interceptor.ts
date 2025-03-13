@@ -1,5 +1,6 @@
 import { InvalidEventOperationError } from '@domain/events/application/errors/invalid-event-operation.error'
 import { InvalidPaymentOperationError } from '@domain/payment/application/errors/invalid-payment-operation.error'
+import { DomainError } from '@domain/shared/domain.error'
 import { InvalidUserOperationError } from '@domain/users/application/errors/invalid-user-operation.error'
 import {
   BadRequestException,
@@ -35,6 +36,10 @@ export class ExceptionHandlerInterceptor implements NestInterceptor {
         }
 
         if (error instanceof InvalidUserOperationError) {
+          throw new BadRequestException(error.message)
+        }
+
+        if (error instanceof DomainError) {
           throw new BadRequestException(error.message)
         }
 

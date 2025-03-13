@@ -1,11 +1,12 @@
 import { UserEntity } from '@domain/users/domain/users.entity'
 
+import { EventAddressEntity } from '@domain/events/domain/entities/event-address.entity'
 import { EventTypeEnum } from '@domain/events/domain/entities/event-type.enum'
 import { EventPriceUpdatedEvent } from '@domain/events/domain/events/event-price-updated.event'
 import { DomainEntity } from '@domain/shared/domain.entity'
 import { DomainError } from '@domain/shared/domain.error'
 import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
-import { Column, Entity, ManyToOne, OneToMany, Relation } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, Relation } from 'typeorm'
 
 @Entity('events')
 export class EventEntity extends DomainEntity {
@@ -38,6 +39,16 @@ export class EventEntity extends DomainEntity {
     (ticket) => ticket.event,
   )
   participants: Relation<TicketEntity[]>
+
+  @OneToOne(
+    () => EventAddressEntity,
+    (address) => address.event,
+    {
+      cascade: true,
+    },
+  )
+  @JoinColumn()
+  address: Relation<EventAddressEntity>
 
   changeCapacity(capacity: number) {
     if (capacity < 0) {
