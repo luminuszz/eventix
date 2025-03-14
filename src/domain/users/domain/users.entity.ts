@@ -1,4 +1,5 @@
 import { DomainEntity } from '@domain/shared/domain.entity'
+import { UserEmailUpdatedEvent } from '@domain/users/domain/events/user-email-updated.event'
 import { Column, Entity, Index } from 'typeorm'
 
 @Entity('users')
@@ -15,4 +16,9 @@ export class UserEntity extends DomainEntity {
 
   @Column({ nullable: false })
   lastName: string
+
+  changeEmail(email: string) {
+    this.email = email
+    this.apply(new UserEmailUpdatedEvent(this))
+  }
 }

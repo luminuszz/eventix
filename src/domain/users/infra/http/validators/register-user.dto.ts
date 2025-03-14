@@ -1,7 +1,7 @@
 import { createZodValidator } from '@infra/utils/zod/create-validator'
 import { z } from 'zod'
 
-const registerUserSchema = z.object({
+export const registerUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   firstName: z.string().min(3),

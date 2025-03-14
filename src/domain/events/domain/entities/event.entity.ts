@@ -2,6 +2,7 @@ import { UserEntity } from '@domain/users/domain/users.entity'
 
 import { EventAddressEntity } from '@domain/events/domain/entities/event-address.entity'
 import { EventTypeEnum } from '@domain/events/domain/entities/event-type.enum'
+import { EventOwnerChangedEvent } from '@domain/events/domain/events/event-owner-changed.event'
 import { EventPriceUpdatedEvent } from '@domain/events/domain/events/event-price-updated.event'
 import { DomainEntity } from '@domain/shared/domain.entity'
 import { DomainError } from '@domain/shared/domain.error'
@@ -74,5 +75,15 @@ export class EventEntity extends DomainEntity {
     this.price = price
 
     this.apply(new EventPriceUpdatedEvent(this))
+  }
+
+  changeOwner(ownerId: string) {
+    if (ownerId === this.ownerId) {
+      throw new DomainError('Cannot transfer ownership to the same user')
+    }
+
+    this.ownerId = ownerId
+
+    this.apply(new EventOwnerChangedEvent(this))
   }
 }

@@ -1,13 +1,14 @@
-import {InvalidEventOperationError} from '@domain/events/application/errors/invalid-event-operation.error'
-import {EventTypeEnum} from '@domain/events/domain/entities/event-type.enum'
-import {EventEntity} from '@domain/events/domain/entities/event.entity'
-import {EventCreated} from '@domain/events/domain/events/event-created'
-import {UserEntity} from '@domain/users/domain/users.entity'
-import {CommandHandler, EventPublisher, ICommandHandler} from '@nestjs/cqrs'
-import {InjectRepository} from '@nestjs/typeorm'
-import {Repository} from 'typeorm'
+import { randomUUID } from 'node:crypto'
+import { InvalidEventOperationError } from '@domain/events/application/errors/invalid-event-operation.error'
+import { EventTypeEnum } from '@domain/events/domain/entities/event-type.enum'
+import { EventEntity } from '@domain/events/domain/entities/event.entity'
+import { EventCreated } from '@domain/events/domain/events/event-created'
+import { UserEntity } from '@domain/users/domain/users.entity'
+import { Command, CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
-export class CreateEventCommand {
+export class CreateEventCommand extends Command<{ actionId: string }> {
   constructor(
     public readonly name: string,
     public readonly description: string,
@@ -15,7 +16,9 @@ export class CreateEventCommand {
     public readonly maxCapacity: number,
     public readonly type: EventTypeEnum,
     public readonly price?: number,
-  ) {}
+  ) {
+    super()
+  }
 }
 
 @CommandHandler(CreateEventCommand)
@@ -28,7 +31,14 @@ export class CreateEventCommandHandler implements ICommandHandler<CreateEventCom
     private readonly publisher: EventPublisher,
   ) {}
 
-  async execute({ description, name, userId, maxCapacity, type, price }: CreateEventCommand) {
+  async execute({
+    description,
+    name,
+    userId,
+    maxCapacity,
+    type,
+    price,
+  }: CreateEventCommand): Promise<{ actionId: string }> {
     const user = await this.userRepository.findOne({ where: { id: userId } })
 
     if (!user) throw new InvalidEventOperationError('User not found')
@@ -49,5 +59,9 @@ export class CreateEventCommandHandler implements ICommandHandler<CreateEventCom
     await this.eventRepository.save(event)
 
     event.commit()
+
+    return {
+      actionId: randomUUID(),
+    }
   }
 }

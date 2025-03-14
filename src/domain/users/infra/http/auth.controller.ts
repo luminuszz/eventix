@@ -1,10 +1,13 @@
-import {CreateSessionCommand} from '@domain/users/application/commands/create-session.command'
-import {CreateUserCommand} from '@domain/users/application/commands/create-user.command'
-import {IsPublic} from '@domain/users/infra/auth.guard'
-import {CreateSessionDto} from '@domain/users/infra/http/validators/create-session.dto'
-import {RegisterUserDto} from '@domain/users/infra/http/validators/register-user.dto'
-import {Body, Controller, HttpCode, HttpStatus, Post} from '@nestjs/common'
-import {CommandBus} from '@nestjs/cqrs'
+import { CreateSessionCommand } from '@domain/users/application/commands/create-session.command'
+import { CreateUserCommand } from '@domain/users/application/commands/create-user.command'
+import { UpdateUserCommand } from '@domain/users/application/commands/update-user.command'
+import { IsPublic } from '@domain/users/infra/auth.guard'
+import { User } from '@domain/users/infra/http/user-auth.decorator'
+import { CreateSessionDto } from '@domain/users/infra/http/validators/create-session.dto'
+import { RegisterUserDto } from '@domain/users/infra/http/validators/register-user.dto'
+import { UpdateUserDto } from '@domain/users/infra/http/validators/update-user.dto'
+import { Body, Controller, HttpCode, HttpStatus, Post, Put } from '@nestjs/common'
+import { CommandBus } from '@nestjs/cqrs'
 
 @Controller('auth')
 export class AuthController {
@@ -27,5 +30,10 @@ export class AuthController {
     return {
       token,
     }
+  }
+
+  @Put('/user')
+  async updateUser(@Body() dto: UpdateUserDto, @User('id') userId: string) {
+    await this.commandBus.execute(new UpdateUserCommand(userId, dto))
   }
 }

@@ -31,6 +31,5 @@ export abstract class PaymentGateway {
   abstract generatePaymentUrlByProduct(dto: GenerateProductPaymentUrlDto): Promise<string>
   abstract createProduct(dto: CreateProductDto): Promise<void>
   abstract updateProductDetails(dto: UpdateProductDetailsDto): Promise<void>
-  abstract registerCostumer(dto: RegisterCostumerDto): Promise<void>
   abstract updateProductPrice(dto: UpdateProductPriceDto): Promise<void>
 }

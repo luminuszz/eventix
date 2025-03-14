@@ -2,7 +2,6 @@ import {
   CreateProductDto,
   GenerateProductPaymentUrlDto,
   PaymentGateway,
-  RegisterCostumerDto,
   UpdateProductDetailsDto,
   UpdateProductPriceDto,
 } from '@domain/payment/application/contracts/payment-gateway'
@@ -59,15 +58,6 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
     )
   }
 
-  async registerCostumer(dto: RegisterCostumerDto): Promise<void> {
-    await this.stripe.customers.create({
-      name: dto.name,
-      email: dto.email,
-      metadata: {
-        userid: dto.id,
-      },
-    })
-  }
   async generatePaymentUrlByProduct({
     paymentId,
     userEmail,
@@ -79,18 +69,8 @@ export class StripePaymentGatewayProvider implements PaymentGateway {
       throw new BadRequestException('Stripe error: Product not found')
     }
 
-    const { data: customerList } = await this.stripe.customers.list({
-      email: userEmail,
-    })
-
-    const customer = customerList.find((item) => item.email === userEmail)
-
-    if (!customer) {
-      throw new BadRequestException('Stripe error: Customer not found')
-    }
-
     const session = await this.stripe.checkout.sessions.create({
-      customer: customer.id,
+      customer_email: userEmail,
       mode: 'payment',
       currency: this.currency,
       payment_method_types: ['card'],
