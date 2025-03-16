@@ -3,7 +3,7 @@ import { RegisterEventAddressCommandHandler } from '@domain/events/application/c
 import { TransferEventOwnerShipCommandHandler } from '@domain/events/application/commands/transfer-event-owner-ship.command'
 import { UpdateEventDetailsCommandHandler } from '@domain/events/application/commands/update-event-details.command'
 import { UpdateEventPriceCommandHandler } from '@domain/events/application/commands/update-event-price.command'
-import { FetchEventsQueryHandler } from '@domain/events/application/queries/fetch-events.query'
+import { QueryHandlers } from '@domain/events/application/queries'
 import { EventAddressEntity } from '@domain/events/domain/entities/event-address.entity'
 import { EventEntity } from '@domain/events/domain/entities/event.entity'
 import { EventController } from '@domain/events/infra/http/events.controller'
@@ -14,8 +14,8 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 @Module({
   imports: [TypeOrmModule.forFeature([EventEntity, UserEntity, EventAddressEntity])],
   providers: [
+    ...QueryHandlers,
     CreateEventCommandHandler,
-    FetchEventsQueryHandler,
     UpdateEventDetailsCommandHandler,
     UpdateEventPriceCommandHandler,
     RegisterEventAddressCommandHandler,

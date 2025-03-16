@@ -49,7 +49,7 @@ export class ExceptionHandlerInterceptor implements NestInterceptor {
           throw new BadRequestException('Not found entity')
         }
 
-        // validations errors [http]
+        // validations errors [zod,  pipes e etc...]
 
         if (this.isZodError(error)) {
           throw new BadRequestException({

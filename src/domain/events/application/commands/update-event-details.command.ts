@@ -9,6 +9,7 @@ export class UpdateEventDetailsCommand extends Command<{ actionId: string }> {
   constructor(
     public readonly eventId: string,
     public readonly userId: string,
+
     public event: Partial<{
       name: string
       description: string

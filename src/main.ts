@@ -9,7 +9,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, adapter, {
     rawBody: true,
   })
-  const apiPort = app.get(EnvService).get('API_PORT')
+
+  const env = app.get(EnvService)
+
+  const apiPort = env.get('API_PORT')
 
   await app.listen(apiPort, '0.0.0.0')
 }

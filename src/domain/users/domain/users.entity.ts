@@ -1,6 +1,7 @@
 import { DomainEntity } from '@domain/shared/domain.entity'
+import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
 import { UserEmailUpdatedEvent } from '@domain/users/domain/events/user-email-updated.event'
-import { Column, Entity, Index } from 'typeorm'
+import { Column, Entity, Index, OneToMany, Relation } from 'typeorm'
 
 @Entity('users')
 export class UserEntity extends DomainEntity {
@@ -8,7 +9,7 @@ export class UserEntity extends DomainEntity {
   @Index()
   email: string
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, name: 'password_hash' })
   passwordHash: string
 
   @Column({ nullable: false })
@@ -21,4 +22,10 @@ export class UserEntity extends DomainEntity {
     this.email = email
     this.apply(new UserEmailUpdatedEvent(this))
   }
+
+  @OneToMany(
+    () => TicketEntity,
+    (ticket) => ticket.user,
+  )
+  tickets: Relation<TicketEntity[]>
 }
