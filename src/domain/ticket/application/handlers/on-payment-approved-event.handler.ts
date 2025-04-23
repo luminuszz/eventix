@@ -21,6 +21,7 @@ export class OnPaymentApprovedEventHandler implements IEventHandler<PaymentConfi
         where: { id: payment.ticketId },
       }),
     )
+
     ticket.aprove()
 
     await this.ticketRepository.save(ticket)

@@ -1,4 +1,6 @@
+import { TicketEntity } from '@domain/ticket/domain/ticket.entity'
 import { CommandHandlers } from '@domain/users/application/commands'
+import { OnEventAddressChangedHandler } from '@domain/users/application/handlers/on-event-address-changed.handler'
 import { QueriesHandlers } from '@domain/users/application/queries'
 import { HashProvider } from '@domain/users/contracts/hash.provider'
 import { AuthGuard } from '@domain/users/infra/auth.guard'
@@ -16,7 +18,7 @@ import { UserEntity } from '../domain/users.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, TicketEntity]),
     EncryptModule,
     JwtModule.registerAsync({
       useFactory: (env: EnvService): JwtModuleOptions => {
@@ -34,6 +36,7 @@ import { UserEntity } from '../domain/users.entity'
   providers: [
     ...CommandHandlers,
     ...QueriesHandlers,
+    OnEventAddressChangedHandler,
     {
       provide: HashProvider,
       useClass: EncryptService,

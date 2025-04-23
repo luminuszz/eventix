@@ -1,10 +1,12 @@
 import { CreateEventCommand } from '@domain/events/application/commands/create-event.command'
 import { RegisterEventAddressCommand } from '@domain/events/application/commands/register-event-address.command'
+import { UpdateEventAddressCommand } from '@domain/events/application/commands/update-event-address.command'
 import { UpdateEventDetailsCommand } from '@domain/events/application/commands/update-event-details.command'
 import { UpdateEventPriceCommand } from '@domain/events/application/commands/update-event-price.command'
 import { FetchEventParticipantsQuery } from '@domain/events/application/queries/fetch-event-participants.query'
 import { FetchEventsQuery } from '@domain/events/application/queries/fetch-events.query'
 import { RegisterEventAddressDto } from '@domain/events/infra/http/dto/register-event-address.dto'
+import { UpdateEventAddressDto } from '@domain/events/infra/http/dto/update-event-address.dto'
 import { UpdateEventDto } from '@domain/events/infra/http/dto/update-event.dto'
 import { UpdatePriceEventDto } from '@domain/events/infra/http/dto/update-price-event.dto'
 import { getParticipantsResponseSchema } from '@domain/events/infra/http/models/get-participants-response.schema'
@@ -67,6 +69,15 @@ export class EventController {
     @User('id') userId: string,
   ) {
     await this.commandBus.execute(new RegisterEventAddressCommand(userId, eventId, body))
+  }
+
+  @Put('/:id/address')
+  async updateEventAddress(
+    @Body() data: UpdateEventAddressDto,
+    @User('id') userId: string,
+    @Param('id', ParseUUIDPipe) eventId: string,
+  ) {
+    await this.commandBus.execute(new UpdateEventAddressCommand(userId, eventId, data))
   }
 
   @Get('/:id/participants')

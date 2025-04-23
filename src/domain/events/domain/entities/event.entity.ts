@@ -41,6 +41,7 @@ export class EventEntity extends DomainEntity {
   )
   participants: Relation<TicketEntity[]>
 
+  @JoinColumn()
   @OneToOne(
     () => EventAddressEntity,
     (address) => address.event,
@@ -48,7 +49,6 @@ export class EventEntity extends DomainEntity {
       cascade: true,
     },
   )
-  @JoinColumn()
   address: Relation<EventAddressEntity>
 
   changeCapacity(capacity: number) {
