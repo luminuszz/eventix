@@ -22,14 +22,16 @@ export class MakeCheckInCommandHandler implements ICommandHandler<MakeCheckInCom
   ) {}
 
   async execute({ userId, ticketId }: MakeCheckInCommand): Promise<void> {
-    const ticket = await this.ticketRepository.findOneOrFail({
-      where: {
-        id: ticketId,
-      },
-      relations: {
-        event: true,
-      },
-    })
+    const ticket = this.publisher.mergeObjectContext(
+      await this.ticketRepository.findOneOrFail({
+        where: {
+          id: ticketId,
+        },
+        relations: {
+          event: true,
+        },
+      }),
+    )
 
     const userIsEventOwner = ticket.event.ownerId === userId
 
@@ -37,12 +39,10 @@ export class MakeCheckInCommandHandler implements ICommandHandler<MakeCheckInCom
 
     if (!userCanMakeCheckIn) throw new BadRequestException('Invalid ticket operation')
 
-    const ticketModel = this.publisher.mergeObjectContext(ticket)
-
-    ticketModel.checkIn()
+    ticket.checkIn()
 
     await this.ticketRepository.save(ticket)
 
-    ticketModel.commit()
+    ticket.commit()
   }
 }

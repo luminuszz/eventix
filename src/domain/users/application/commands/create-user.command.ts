@@ -35,12 +35,12 @@ export class CreateUserCommandHandler implements ICommandHandler<CreateUserComma
       throw new InvalidUserOperationError('User already exists')
     }
 
-    const passwordHash = await this.hashProvider.hash(payload.password)
+    payload.password = await this.hashProvider.hash(payload.password)
 
     const newUser = this.eventPublisher.mergeObjectContext(
       this.userRepository.create({
         email: payload.email,
-        passwordHash,
+        passwordHash: payload.password,
         firstName: payload.firstName,
         lastName: payload.lastName,
       }),

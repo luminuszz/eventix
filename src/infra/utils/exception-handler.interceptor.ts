@@ -23,34 +23,24 @@ export class ExceptionHandlerInterceptor implements NestInterceptor {
     )
   }
 
+  private domainErrors = [
+    InvalidPaymentOperationError,
+    InvalidEventOperationError,
+    InvalidUserOperationError,
+    InvalidUserOperationError,
+    DomainError,
+    EntityNotFoundError,
+  ]
+
   intercept(_: ExecutionContext, next: CallHandler): Observable<unknown> {
     return next.handle().pipe(
       catchError((error: unknown) => {
         // application errors
-
-        if (error instanceof InvalidPaymentOperationError) {
-          throw new BadRequestException(error.message)
-        }
-        if (error instanceof InvalidEventOperationError) {
-          throw new BadRequestException(error.message)
-        }
-
-        if (error instanceof InvalidUserOperationError) {
-          throw new BadRequestException(error.message)
-        }
-
-        if (error instanceof DomainError) {
-          throw new BadRequestException(error.message)
-        }
-
-        // database errors
-
-        if (error instanceof EntityNotFoundError) {
-          throw new BadRequestException('Not found entity')
+        if (this.domainErrors.some((err) => error instanceof err)) {
+          throw new BadRequestException(error)
         }
 
         // validations errors [zod,  pipes e etc...]
-
         if (this.isZodError(error)) {
           throw new BadRequestException({
             message: 'Validation error',

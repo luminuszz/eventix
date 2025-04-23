@@ -1,4 +1,4 @@
-import {SafeParseReturnType, z} from 'zod'
+import { SafeParseReturnType, z } from 'zod'
 
 export interface zodValidator<InputType, ReturnType> {
   new (): ReturnType
@@ -6,7 +6,9 @@ export interface zodValidator<InputType, ReturnType> {
   create(data: unknown): SafeParseReturnType<InputType, ReturnType>
 }
 
-export function createZodValidator<SchemaType extends z.ZodType>(schema: SchemaType) {
+export function createZodValidator<SchemaType extends z.ZodType | z.ZodOptionalType<SchemaType>>(
+  schema: SchemaType,
+) {
   type InputType = (typeof schema)['_input']
   type ZodType = z.infer<typeof schema>
 

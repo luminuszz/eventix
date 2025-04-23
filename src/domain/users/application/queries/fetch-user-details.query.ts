@@ -1,5 +1,4 @@
 import { UserEntity } from '@domain/users/domain/users.entity'
-import { Logger } from '@nestjs/common'
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
@@ -19,8 +18,6 @@ export class FetchUserDetailsQueryHandler implements IQueryHandler<FetchUserDeta
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  private logger = new Logger(FetchUserDetailsQuery.name)
-
   async execute({ userId }: FetchUserDetailsQuery): Promise<{ user: UserEntity }> {
     const user = await this.usersRepository
       .createQueryBuilder('user')
@@ -39,8 +36,6 @@ export class FetchUserDetailsQueryHandler implements IQueryHandler<FetchUserDeta
         'event.description',
       ])
       .getOneOrFail()
-
-    this.logger.debug(user)
 
     return {
       user,

@@ -1,7 +1,7 @@
-import { UserEntity } from '@domain/users/domain/users.entity'
-import { Command, CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import {UserEntity} from '@domain/users/domain/users.entity'
+import {Command, CommandHandler, EventPublisher, ICommandHandler} from '@nestjs/cqrs'
+import {InjectRepository} from '@nestjs/typeorm'
+import {Repository} from 'typeorm'
 
 export class UpdateUserCommand extends Command<void> {
   constructor(
@@ -33,10 +33,7 @@ export class UpdateUserCommandHandler implements ICommandHandler<UpdateUserComma
       }),
     )
 
-    if (dto.email) {
-      user.changeEmail(dto.email)
-    }
-
+    dto.email && user.changeEmail(dto.email)
     user.firstName = dto.firstName ?? user.firstName
     user.lastName = dto.lastName ?? user.lastName
 
